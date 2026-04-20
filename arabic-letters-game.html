@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arabic Letters Game — Nooraya Kids</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+
+  body{
+    font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+    background:#f3f4f6;
+    min-height:100vh;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    padding:24px 16px 48px;
+  }
+
+  .game-wrapper{
+    background:#ffffff;
+    border-radius:20px;
+    box-shadow:0 2px 16px rgba(0,0,0,0.08);
+    width:100%;
+    max-width:500px;
+    padding:28px 24px;
+    min-height:560px;
+  }
+
+  .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);}
+
+  .top-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+
+  .game-label{font-size:13px;font-weight:600;color:#6b7280;letter-spacing:.4px;text-transform:uppercase;}
+
+  .chips{display:flex;gap:7px;}
+
+  .chip{padding:4px 11px;border-radius:20px;font-size:12px;font-weight:600;border:1.5px solid;}
+  .c-score{background:#EAF3DE;color:#27500A;border-color:#97C459;}
+  .c-step{background:#E6F1FB;color:#0C447C;border-color:#85B7EB;}
+  .c-streak{background:#FAEEDA;color:#633806;border-color:#EF9F27;}
+
+  .mode-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px;}
+
+  .mode-btn{
+    border:1.5px solid #e5e7eb;
+    border-radius:12px;
+    padding:12px 6px;
+    background:#fff;
+    cursor:pointer;
+    text-align:center;
+    transition:border-color .15s,background .15s;
+    font-family:inherit;
+  }
+  .mode-btn:hover{background:#f9fafb;border-color:#9ca3af;}
+  .mode-btn.active{border-color:#185FA5;background:#E6F1FB;}
+  .mode-btn:focus-visible{outline:3px solid #378ADD;outline-offset:2px;}
+
+  .mode-icon{font-size:22px;display:block;margin-bottom:4px;}
+  .mode-name{font-size:12px;font-weight:600;color:#374151;}
+  .mode-desc{font-size:10px;color:#6b7280;margin-top:2px;}
+
+  .intro-card{background:#f9fafb;border:1px solid #e5e7eb;border-radius:16px;padding:22px 18px;margin-bottom:16px;}
+  .intro-title{font-size:17px;font-weight:600;color:#111827;margin-bottom:6px;}
+  .intro-sub{font-size:13px;color:#6b7280;margin-bottom:16px;line-height:1.5;}
+
+  .alphabet-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:16px;}
+  .alpha-cell{background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:6px 2px;text-align:center;}
+  .alpha-ar{font-size:20px;display:block;direction:rtl;color:#111827;}
+  .alpha-en{font-size:9px;color:#6b7280;font-weight:500;}
+
+  .start-btn{
+    width:100%;
+    padding:14px;
+    border-radius:12px;
+    border:none;
+    background:#185FA5;
+    color:#fff;
+    font-size:15px;
+    font-weight:600;
+    cursor:pointer;
+    font-family:inherit;
+    transition:background .15s;
+  }
+  .start-btn:hover{background:#0C447C;}
+  .start-btn:focus-visible{outline:3px solid #378ADD;outline-offset:2px;}
+
+  .q-card{
+    background:#f9fafb;
+    border:1px solid #e5e7eb;
+    border-radius:16px;
+    padding:26px 16px;
+    text-align:center;
+    margin-bottom:16px;
+  }
+
+  .cat-pill{
+    display:inline-block;
+    padding:3px 11px;
+    border-radius:20px;
+    font-size:11px;
+    font-weight:600;
+    letter-spacing:.3px;
+    text-transform:uppercase;
+    margin-bottom:12px;
+    background:#EEEDFE;
+    color:#3C3489;
+    border:1px solid #AFA9EC;
+  }
+
+  .arabic-big{
+    font-size:80px;
+    line-height:1;
+    display:block;
+    margin-bottom:12px;
+    color:#111827;
+    direction:rtl;
+  }
+
+  .letter-name{font-size:20px;font-weight:600;color:#111827;margin-bottom:4px;}
+  .letter-sub{font-size:13px;color:#6b7280;}
+
+  .prog-track{height:4px;background:#e5e7eb;border-radius:4px;margin-top:16px;overflow:hidden;}
+  .prog-fill{height:100%;background:#185FA5;border-radius:4px;transition:width .4s ease;}
+
+  .options-grid{display:grid;gap:10px;margin-bottom:14px;}
+
+  .opt-btn{
+    border:1.5px solid #e5e7eb;
+    border-radius:12px;
+    padding:14px 16px;
+    background:#fff;
+    cursor:pointer;
+    font-family:inherit;
+    font-size:15px;
+    font-weight:600;
+    color:#111827;
+    text-align:center;
+    transition:border-color .15s,background .15s;
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+  .opt-btn:hover{background:#f9fafb;border-color:#9ca3af;}
+  .opt-btn:focus-visible{outline:3px solid #378ADD;outline-offset:2px;}
+
+  .opt-arabic{font-size:30px;direction:rtl;color:#111827;}
+  .opt-label{font-size:14px;color:#374151;}
+
+  .opt-correct{background:#EAF3DE !important;border-color:#3B6D11 !important;color:#27500A !important;}
+  .opt-wrong{background:#FCEBEB !important;border-color:#A32D2D !important;color:#791F1F !important;}
+
+  .fb-panel{
+    border-radius:12px;
+    padding:14px 16px;
+    margin-bottom:12px;
+    display:flex;
+    gap:12px;
+    align-items:flex-start;
+  }
+  .fb-ok{background:#EAF3DE;border:1.5px solid #97C459;}
+  .fb-no{background:#FCEBEB;border:1.5px solid #F09595;}
+
+  .fb-icon{font-size:22px;flex-shrink:0;}
+  .fb-title{font-size:14px;font-weight:600;margin-bottom:3px;}
+  .fb-ok .fb-title{color:#27500A;}
+  .fb-no .fb-title{color:#791F1F;}
+  .fb-text{font-size:13px;color:#4b5563;line-height:1.5;}
+
+  .next-btn{
+    width:100%;
+    padding:14px;
+    border-radius:12px;
+    border:none;
+    background:#185FA5;
+    color:#fff;
+    font-size:15px;
+    font-weight:600;
+    cursor:pointer;
+    font-family:inherit;
+    transition:background .15s;
+  }
+  .next-btn:hover{background:#0C447C;}
+  .next-btn:focus-visible{outline:3px solid #378ADD;outline-offset:2px;}
+
+  .results{text-align:center;padding:6px 0;}
+  .res-big{font-size:54px;display:block;margin-bottom:12px;}
+  .res-title{font-size:22px;font-weight:600;color:#111827;margin-bottom:8px;}
+  .stars{display:flex;justify-content:center;gap:5px;font-size:28px;margin-bottom:12px;}
+  .res-score{font-size:42px;font-weight:700;color:#111827;margin-bottom:4px;}
+  .res-sub{font-size:13px;color:#6b7280;margin-bottom:20px;line-height:1.5;}
+
+  .divider{height:1px;background:#e5e7eb;margin:14px 0;}
+
+  .rev-list{text-align:left;margin-bottom:16px;}
+  .rev-item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:9px 12px;
+    border-radius:9px;
+    margin-bottom:5px;
+    border:1px solid #e5e7eb;
+    background:#fff;
+  }
+  .rev-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+  .dot-ok{background:#3B6D11;}
+  .dot-no{background:#E24B4A;}
+  .rev-ar{font-size:24px;direction:rtl;color:#111827;flex-shrink:0;min-width:32px;text-align:center;}
+  .rev-text{flex:1;}
+  .rev-name{font-size:13px;font-weight:600;color:#111827;}
+  .rev-detail{font-size:11px;color:#6b7280;margin-top:1px;}
+
+  .again-btn{
+    width:100%;
+    padding:13px;
+    border-radius:12px;
+    border:1.5px solid #185FA5;
+    background:transparent;
+    color:#185FA5;
+    font-size:14px;
+    font-weight:600;
+    cursor:pointer;
+    font-family:inherit;
+    transition:background .15s;
+    margin-bottom:10px;
+  }
+  .again-btn:hover{background:#E6F1FB;}
+  .again-btn:focus-visible{outline:3px solid #378ADD;outline-offset:2px;}
+
+  .branding{
+    text-align:center;
+    margin-top:20px;
+    font-size:12px;
+    color:#9ca3af;
+  }
+  .branding a{color:#185FA5;text-decoration:none;font-weight:600;}
+  .branding a:hover{text-decoration:underline;}
+
+  @media(max-width:480px){
+    body{padding:0;}
+    .game-wrapper{border-radius:0;box-shadow:none;min-height:100vh;}
+    .arabic-big{font-size:64px;}
+    .alphabet-grid{grid-template-columns:repeat(5,1fr);}
+  }
+</style>
+</head>
+<body>
+<div class="game-wrapper">
+  <h2 class="sr-only">Arabic letters learning game — three modes to learn all 28 Arabic alphabet letters.</h2>
+  <div id="ga"></div>
+  <div class="branding">Made with ❤️ by <a href="https://www.youtube.com/@NoorayaStories" target="_blank">Nooraya Stories</a></div>
+</div>
+
+<script>
+const LETTERS=[
+  {ar:'أ',name:'Alif',sound:'a',example:'أسد (lion)'},
+  {ar:'ب',name:'Ba',sound:'b',example:'بيت (house)'},
+  {ar:'ت',name:'Ta',sound:'t',example:'تفاح (apple)'},
+  {ar:'ث',name:'Tha',sound:'th',example:'ثعلب (fox)'},
+  {ar:'ج',name:'Jeem',sound:'j',example:'جمل (camel)'},
+  {ar:'ح',name:'Ha',sound:'ḥ',example:'حصان (horse)'},
+  {ar:'خ',name:'Kha',sound:'kh',example:'خروف (sheep)'},
+  {ar:'د',name:'Dal',sound:'d',example:'دب (bear)'},
+  {ar:'ذ',name:'Dhal',sound:'dh',example:'ذهب (gold)'},
+  {ar:'ر',name:'Ra',sound:'r',example:'رأس (head)'},
+  {ar:'ز',name:'Zay',sound:'z',example:'زهرة (flower)'},
+  {ar:'س',name:'Seen',sound:'s',example:'سمك (fish)'},
+  {ar:'ش',name:'Sheen',sound:'sh',example:'شمس (sun)'},
+  {ar:'ص',name:'Sad',sound:'ṣ',example:'صقر (falcon)'},
+  {ar:'ض',name:'Dad',sound:'ḍ',example:'ضفدع (frog)'},
+  {ar:'ط',name:'Ta',sound:'ṭ',example:'طاولة (table)'},
+  {ar:'ظ',name:'Dha',sound:'ẓ',example:'ظبي (deer)'},
+  {ar:'ع',name:'Ain',sound:'ʿ',example:'عين (eye)'},
+  {ar:'غ',name:'Ghain',sound:'gh',example:'غزال (gazelle)'},
+  {ar:'ف',name:'Fa',sound:'f',example:'فيل (elephant)'},
+  {ar:'ق',name:'Qaf',sound:'q',example:'قمر (moon)'},
+  {ar:'ك',name:'Kaf',sound:'k',example:'كتاب (book)'},
+  {ar:'ل',name:'Lam',sound:'l',example:'ليمون (lemon)'},
+  {ar:'م',name:'Meem',sound:'m',example:'مسجد (mosque)'},
+  {ar:'ن',name:'Noon',sound:'n',example:'نجمة (star)'},
+  {ar:'ه',name:'Ha',sound:'h',example:'هلال (crescent)'},
+  {ar:'و',name:'Waw',sound:'w/oo',example:'ورد (rose)'},
+  {ar:'ي',name:'Ya',sound:'y/ee',example:'يد (hand)'},
+];
+
+const MODES=[
+  {id:'name',icon:'🔤',name:'Name it',desc:'See Arabic → pick name'},
+  {id:'letter',icon:'✍️',name:'Find it',desc:'See name → pick letter'},
+  {id:'sound',icon:'🔊',name:'Sound it',desc:'See sound → pick letter'},
+];
+
+let mode='name',qs=[],cur=0,score=0,streak=0,answered=false,history=[];
+
+function shuffle(a){return[...a].sort(()=>Math.random()-.5);}
+
+function getWrong(correct,field,n){
+  return shuffle(LETTERS.filter(l=>l[field]!==correct[field])).slice(0,n);
+}
+
+function buildQ(letter){
+  if(mode==='name'){
+    const wrongs=getWrong(letter,'name',3);
+    const opts=shuffle([letter,...wrongs]);
+    return{
+      prompt:letter.ar,
+      promptLabel:'What is this letter?',
+      promptSub:null,
+      opts:opts.map(o=>({label:o.name,sub:'/ '+o.sound+'/',value:o.name,ar:null})),
+      correct:letter.name,
+      info:letter.example
+    };
+  } else if(mode==='letter'){
+    const wrongs=getWrong(letter,'ar',3);
+    const opts=shuffle([letter,...wrongs]);
+    return{
+      prompt:letter.name,
+      promptLabel:'Find the Arabic letter',
+      promptSub:'Sound: /'+letter.sound+'/',
+      opts:opts.map(o=>({label:null,sub:null,value:o.ar,ar:o.ar})),
+      correct:letter.ar,
+      info:letter.example
+    };
+  } else {
+    const wrongs=getWrong(letter,'ar',3);
+    const opts=shuffle([letter,...wrongs]);
+    return{
+      prompt:'/'+letter.sound+'/',
+      promptLabel:'Find the letter with this sound',
+      promptSub:letter.name,
+      opts:opts.map(o=>({label:null,sub:null,value:o.ar,ar:o.ar})),
+      correct:letter.ar,
+      info:letter.example
+    };
+  }
+}
+
+function start(){
+  qs=shuffle(LETTERS).slice(0,10).map(l=>({letter:l,q:buildQ(l)}));
+  cur=0;score=0;streak=0;answered=false;history=[];
+  render();
+}
+
+function showIntro(){
+  const alphaGrid=LETTERS.map(l=>`
+    <div class="alpha-cell">
+      <span class="alpha-ar">${l.ar}</span>
+      <span class="alpha-en">${l.name}</span>
+    </div>`).join('');
+
+  document.getElementById('ga').innerHTML=`
+    <div class="top-bar">
+      <span class="game-label">Arabic letters</span>
+    </div>
+    <div class="intro-card">
+      <div class="intro-title">Learn all 28 Arabic letters</div>
+      <div class="intro-sub">Pick a game mode below, then answer 10 questions. Every round shuffles new letters!</div>
+      <div class="alphabet-grid">${alphaGrid}</div>
+    </div>
+    <div class="mode-row">
+      ${MODES.map(m=>`
+        <button class="mode-btn${m.id===mode?' active':''}" onclick="setMode('${m.id}')" aria-pressed="${m.id===mode}">
+          <span class="mode-icon">${m.icon}</span>
+          <div class="mode-name">${m.name}</div>
+          <div class="mode-desc">${m.desc}</div>
+        </button>`).join('')}
+    </div>
+    <button class="start-btn" onclick="start()">Start game →</button>
+  `;
+}
+
+function setMode(m){
+  mode=m;
+  document.querySelectorAll('.mode-btn').forEach(b=>{
+    const isActive=b.getAttribute('onclick').includes("'"+m+"'");
+    b.classList.toggle('active',isActive);
+    b.setAttribute('aria-pressed',String(isActive));
+  });
+}
+
+function render(){
+  if(cur>=qs.length){renderResults();return;}
+  const {letter,q}=qs[cur];
+  const prog=Math.round((cur/qs.length)*100);
+  const cols=mode==='name'?1:2;
+
+  const optsHtml=q.opts.map(o=>{
+    const safeVal=o.value.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    return `
+      <button class="opt-btn" onclick="checkAnswer('${safeVal}',this)" aria-label="${o.ar||o.label}">
+        ${o.ar?`<span class="opt-arabic">${o.ar}</span>`:''}
+        ${o.label?`<span class="opt-label">${o.label} <span style="font-weight:400;color:#6b7280;font-size:12px">${o.sub||''}</span></span>`:''}
+      </button>`;
+  }).join('');
+
+  document.getElementById('ga').innerHTML=`
+    <div class="top-bar">
+      <span class="game-label">Arabic letters</span>
+      <div class="chips">
+        <span class="chip c-score">⭐ ${score}</span>
+        ${streak>=2?`<span class="chip c-streak">🔥 ${streak}</span>`:''}
+        <span class="chip c-step">${cur+1}/10</span>
+      </div>
+    </div>
+    <div class="q-card">
+      <span class="cat-pill">${MODES.find(m2=>m2.id===mode).name}</span>
+      <span class="arabic-big" dir="rtl">${q.prompt}</span>
+      <div class="letter-name">${q.promptLabel}</div>
+      ${q.promptSub?`<div class="letter-sub">${q.promptSub}</div>`:''}
+      <div class="prog-track"><div class="prog-fill" style="width:${prog}%"></div></div>
+    </div>
+    <div class="options-grid" style="grid-template-columns:repeat(${cols},1fr)">${optsHtml}</div>
+  `;
+}
+
+function checkAnswer(val,btn){
+  if(answered)return;
+  answered=true;
+  const {letter,q}=qs[cur];
+  const ok=val===q.correct;
+  if(ok){score+=10;streak++;}else{streak=0;}
+  history.push({letter,ok,chose:val});
+
+  document.querySelectorAll('.opt-btn').forEach(b=>{
+    b.style.pointerEvents='none';
+    const m=b.getAttribute('onclick').match(/'(.*?)'/);
+    if(m){
+      if(m[1]===q.correct)b.classList.add('opt-correct');
+      else if(m[1]===val&&!ok)b.classList.add('opt-wrong');
+    }
+  });
+
+  const nextLabel=cur+1>=qs.length?'See results →':'Next letter →';
+  const fb=`
+    <div class="fb-panel ${ok?'fb-ok':'fb-no'}" role="status" aria-live="polite">
+      <span class="fb-icon">${ok?'✅':'💡'}</span>
+      <div>
+        <div class="fb-title">${ok?'Correct! MashaAllah!':'Not quite!'}</div>
+        <div class="fb-text">${ok?'Great job! ':'The answer is <strong>'+q.correct+'</strong>. '}Example: ${q.info}</div>
+      </div>
+    </div>
+    <button class="next-btn" onclick="nextQ()">${nextLabel}</button>
+  `;
+  document.getElementById('ga').insertAdjacentHTML('beforeend',fb);
+}
+
+function nextQ(){answered=false;cur++;render();}
+
+function renderResults(){
+  const pct=Math.round(score/(qs.length*10)*100);
+  const stars=pct>=90?3:pct>=60?2:1;
+  const trophy=pct>=90?'🏆':pct>=60?'⭐':'📚';
+  const msg=pct>=90?'MashaAllah! Excellent Arabic knowledge!':pct>=60?'Well done! Keep practising!':'Every letter learned is a blessing. Keep going!';
+  const starsHtml=Array.from({length:3},(_,i)=>i<stars?'⭐':'☆').join('');
+
+  const rev=history.map(h=>`
+    <div class="rev-item">
+      <span class="rev-dot ${h.ok?'dot-ok':'dot-no'}"></span>
+      <span class="rev-ar">${h.letter.ar}</span>
+      <div class="rev-text">
+        <div class="rev-name">${h.letter.name} &nbsp;/&nbsp; <span style="color:#6b7280;font-weight:400">${h.letter.sound}</span></div>
+        <div class="rev-detail">${h.ok?h.letter.example:'You chose: '+h.chose+' · '+h.letter.example}</div>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('ga').innerHTML=`
+    <div class="results">
+      <span class="res-big">${trophy}</span>
+      <div class="res-title">Round complete!</div>
+      <div class="stars" aria-label="${stars} out of 3 stars">${starsHtml}</div>
+      <div class="res-score">${score}<span style="font-size:18px;color:#6b7280;font-weight:400"> / ${qs.length*10}</span></div>
+      <div class="res-sub">${msg}</div>
+      <div class="divider"></div>
+      <div class="rev-list">${rev}</div>
+      <button class="again-btn" onclick="showIntro()">&#8592; Change mode</button>
+      <button class="next-btn" onclick="start()">Play again →</button>
+    </div>
+  `;
+}
+
+showIntro();
+</script>
+</body>
+</html>
